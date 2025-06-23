@@ -1,0 +1,14 @@
+version: "2.3"
+
+services:
+  listener:
+    build: .
+    container_name: ros-listener
+    tty: true            # keep stdin open for the prompt
+    stdin_open: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock   # allow docker network connect
+      - ~/ws:/opt/ros/ws
+      - ./images:/app/images  # Mount host ./images to container /app/images
+    restart: unless-stopped
+
