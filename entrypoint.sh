@@ -31,7 +31,7 @@ export AWS_CERT_FILE="/ben-dell-xps.cert.pem"
 export AWS_KEY_FILE="/ben-dell-xps.private.key"
 export AWS_CA_FILE="/root-CA.crt"
 export CLIENT_ID="basicPubSub"
-export MQTT_TOPIC="iot/bluerov"
+export MQTT_TOPIC="iot/uuv0"
 export ROS_TOPIC="${ROS_TOPIC:-/ground_truth_to_tf_uuv0/pose}"
 
 echo "\nRunning ROS to AWS IoT bridge...\n"
@@ -42,7 +42,7 @@ echo "Starting AWS IoT publisher (Python 3.10)..."
 AWS_PID=$!
 
 # Give AWS publisher time to start and create socket server
-sleep 3
+sleep 5
 
 # Start ROS listener (Python 2.7) 
 echo "Starting ROS listener (Python 2.7)..."

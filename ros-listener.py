@@ -10,27 +10,40 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge
 import base64
 import os
+import time
 
 
 class ROSListener:
     def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect(('localhost', 9999))
+        for i in range (0,3):
+            try:
+                self.sock.connect(('localhost', 9999))
+                break
+            except Exception as e:
+                if i == 2:
+                    print("Failed to connect to AWS bridge. Aborting.")
+                    exit(503)
+                print("Failed to connect to AWS bridge. Trying again ({}/3)".format(i+1))
+                time.sleep(1)
         self.bridge = CvBridge()
         self.frame_counter = 0
     
     def message_callback(self, msg, topic_name):
         try:
-            if topic_name == "/uuv0/camera/image_raw":
-                print("Image found")
-                
-                # Skip frames for performance (send every 10th frame)
+            if  topic_name == "/uuv0/camera/image_raw":
+                # Skip frames for performance (send every xth frame)
                 self.frame_counter += 1
-                if self.frame_counter % 10 != 0:
+                if self.frame_counter % 15 != 1:
                     return
                 
                 # Convert ROS image to OpenCV format
                 cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+                # self.output_dir = "/app/images"
+                # if not os.path.exists(self.output_dir):
+                #     os.makedirs(self.output_dir)
+                # filename = os.path.join(self.output_dir, "frame_{}.jpg".format("l" if topic_name == "/vu_sss/waterfall_l" else "r"))
+                # cv2.imwrite(filename, cv_image)
                 
                 # Resize to reduce data size 
                 small_image = cv2.resize(cv_image, (320, 240))
@@ -51,10 +64,26 @@ class ROSListener:
                     'original_height': msg.height,
                     'compressed_width': 320,
                     'compressed_height': 240,
-                    'frame_number': self.frame_counter // 3,  # Actual frames sent
+                    'frame_number': self.frame_counter // 15,  # Actual frames sent
                     'compression_quality': 40
                 }
-                                
+
+            elif topic_name == "/vu_sss/waterfall_r" or topic_name == "/vu_sss/waterfall_l":
+                cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
+
+                _, buffer = cv2.imencode('.jpg', cv_image)                
+                image_base64 = base64.b64encode(buffer).decode('utf-8')
+                
+                payload_dict = {
+                    '_ros_topic': topic_name,
+                    'image_data': image_base64,
+                    'cam_side': 'l' if topic_name == "/vu_sss/waterfall_l" else "r",
+                    'image_encoding': 'jpeg_base64',
+                    'width': msg.width,
+                    'height': msg.height,
+                    'something': 'here' #there should be some sort of img_id here 
+                }
+            
             else:
                 # Handle non-image messages normally
                 payload_dict = message_converter.convert_ros_message_to_dictionary(msg)
@@ -72,7 +101,7 @@ def main():
     listener = ROSListener()
     rospy.loginfo("ROS listener bridge started")
     
-    topics = ['/ground_truth_to_tf_uuv0/pose', '/uuv0/pixhawk_hw', '/uuv0/camera/image_raw', '/uuv0/speed']
+    topics = ['/ground_truth_to_tf_uuv0/pose', '/uuv0/pixhawk_hw', '/uuv0/camera/image_raw', '/uuv0/speed', '/vu_sss/waterfall_r', '/vu_sss/waterfall_l']
     
     for topic in topics:
         ros_topic = rospy.get_param('~ros_topic', topic)

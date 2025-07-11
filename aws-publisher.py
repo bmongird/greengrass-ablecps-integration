@@ -15,7 +15,8 @@ class AWSPublisher:
         self.AWS_KEY_FILE = os.getenv("AWS_KEY_FILE", "priv.key")
         self.AWS_CA_FILE = os.getenv("AWS_CA_FILE", "AmazonRootCA1.pem")
         self.CLIENT_ID = os.getenv("CLIENT_ID", "ros-mqtt-bridge")
-        self.MQTT_TOPIC = os.getenv("MQTT_TOPIC", "robot/pose")
+        self.MQTT_TOPIC = os.getenv("MQTT_TOPIC", "robot")
+        self.MQTT_RECEIVE_TOPIC = os.getenv("MQTT_RECEIVE_TOPIC", "iot/bluerov/commands")
         
         # Proxy support
         PROXY = (os.getenv("HTTPS_PROXY") or os.getenv("https_proxy") or "").replace("http://","").split(":")
@@ -37,7 +38,20 @@ class AWSPublisher:
         # Connect to AWS IoT
         print(f"Connecting to AWS IoT Core at {self.AWS_ENDPOINT}...")
         self.mqtt_connection.connect().result()
-        print("Connected to AWS IoT Core")
+        print("Connected to AWS IoT Core", flush=True)
+
+        print("Subscribing to iot/bluerov/commands", flush=True)
+        subscribe_future, packet_id = self.mqtt_connection.subscribe(
+        topic=self.MQTT_RECEIVE_TOPIC,
+        qos=mqtt.QoS.AT_LEAST_ONCE,
+        callback=self.on_mqtt_message_received)
+
+        subscribe_result = subscribe_future.result()
+        print("Subscribed with {}".format(str(subscribe_result['qos'])), flush=True)
+    
+    def on_mqtt_message_received(self, topic, payload, dup, qos, retain, **kwargs):
+        print("Received message from topic {}: {}".format(topic, payload), flush=True)
+
         
     def listen_for_messages(self):
         # Create socket server to receive from ROS
@@ -86,12 +100,19 @@ class AWSPublisher:
                                     subtopic = "image"
                                     message_dict["id"] = "xps-image"
                                     image_data = message_dict.get('image_data', '')
-                                    if image_data:
-                                        print(f"Image data size: {len(image_data)} characters")
-                                        print(f"Estimated payload size: ~{len(json.dumps(message_dict)) / 1024:.1f} KB")
+                                    # if image_data:
+                                    #     print(f"Image data size: {len(image_data)} characters")
+                                    #     print(f"Estimated payload size: ~{len(json.dumps(message_dict)) / 1024:.1f} KB")
                                 case "/uuv0/speed":
                                     subtopic = "speed"
                                     message_dict["id"] = "xps-speed"
+                                case '/vu_sss/waterfall_l':
+                                    subtopic = "waterfall_l"
+                                    message_dict["id"] = 'waterfall_l'
+                                case '/vu_sss/waterfall_r':
+                                    subtopic = "waterfall_r"
+                                    message_dict["id"] = 'waterfall_r'
+
                             
                             self.publish_to_aws(message_dict, subtopic)
                             

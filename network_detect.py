@@ -19,6 +19,8 @@ def start_listener(name):
     containers[name[8:]] = container
     
 
+print("Initiating new docker network detection")
+
 for ev in client.events(filters=filters, decode=True):
     if ev["Type"] == "network" and ev["Action"] == "create":
         ts   = datetime.datetime.now().strftime("%F %T")
