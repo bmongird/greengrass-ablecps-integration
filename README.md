@@ -1,0 +1,2 @@
+## Overview
+This is a ROS/MQTT AWS messaging layer designed to take relevant ROS messages from AbLECPS and relay them to AWS IoT Core's MQTT broker. It is deployed as a Greengrass component onto a Core device (the same device running the simulation).

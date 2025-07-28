@@ -32,12 +32,13 @@ class ROSListener:
     def message_callback(self, msg, topic_name):
         try:
             if  topic_name == "/uuv0/camera/image_raw":
-                # Skip frames for performance (send every xth frame)
+                frame_division = 15
+                # skip frames for performance (send every xth frame)
                 self.frame_counter += 1
-                if self.frame_counter % 15 != 1:
+                if self.frame_counter % frame_division != 1:
                     return
                 
-                # Convert ROS image to OpenCV format
+                # convert ROS image to OpenCV format
                 cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
                 # self.output_dir = "/app/images"
                 # if not os.path.exists(self.output_dir):
@@ -45,17 +46,17 @@ class ROSListener:
                 # filename = os.path.join(self.output_dir, "frame_{}.jpg".format("l" if topic_name == "/vu_sss/waterfall_l" else "r"))
                 # cv2.imwrite(filename, cv_image)
                 
-                # Resize to reduce data size 
+                # resize to reduce data size 
                 small_image = cv2.resize(cv_image, (320, 240))
                 
-                # Encode as JPEG with lower quality for smaller size
+                # encode as jpg with lower quality for smaller size
                 _, buffer = cv2.imencode('.jpg', small_image, 
                                        [cv2.IMWRITE_JPEG_QUALITY, 40])
                 
-                # Convert to base64 for JSON transmission
+                # convert to base64 for json transmission
                 image_base64 = base64.b64encode(buffer).decode('utf-8')
                 
-                # Create payload dictionary
+                # create payload dictionary
                 payload_dict = {
                     '_ros_topic': topic_name,
                     'image_data': image_base64,
@@ -64,7 +65,7 @@ class ROSListener:
                     'original_height': msg.height,
                     'compressed_width': 320,
                     'compressed_height': 240,
-                    'frame_number': self.frame_counter // 15,  # Actual frames sent
+                    'frame_number': self.frame_counter // frame_division,  # actual frames sent
                     'compression_quality': 40
                 }
 
@@ -85,11 +86,10 @@ class ROSListener:
                 }
             
             else:
-                # Handle non-image messages normally
                 payload_dict = message_converter.convert_ros_message_to_dictionary(msg)
                 payload_dict['_ros_topic'] = topic_name
             
-            # Send as JSON over socket
+            # send as json over socket
             json_data = json.dumps(payload_dict) + '\n'
             self.sock.send(json_data.encode('utf-8'))
             
@@ -107,7 +107,7 @@ def main():
         ros_topic = rospy.get_param('~ros_topic', topic)
         msg_cls, _, _ = rostopic.get_topic_class(ros_topic, blocking=True)
         
-        # Use lambda to pass topic name to callback
+        # use lambda to pass topic name to callback
         rospy.Subscriber(ros_topic, msg_cls, 
                         lambda msg, topic=ros_topic: listener.message_callback(msg, topic),
                         queue_size=1)

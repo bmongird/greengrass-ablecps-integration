@@ -38,26 +38,31 @@ RUN /usr/local/bin/python3.10 -m pip install --no-cache-dir awsiotsdk awscrt
 # Copy the static docker client from stage 1
 COPY --from=dockercli /usr/local/bin/docker /usr/local/bin/docker
 
-RUN apt install -y ros-melodic-uuv-simulator
+# RUN apt install -y ros-melodic-uuv-simulator
+RUN /usr/local/bin/python3.10 -m pip install --no-cache-dir awsiotsdk
 
 # Install custom messages
 COPY bluerov_src /msgs/bluerov
+
+# Before the catkin_make, add this to see dependencies
 RUN bash -c "source /opt/ros/melodic/setup.bash && \
-    cd msgs/bluerov/ && \
+    cd /msgs/bluerov && \
+    rosdep install --from-paths src --ignore-src -r -y && \
     catkin_make"
 
 # Copy application files
 COPY ros-listener.py /ros-listener.py      
-COPY img.py /img.py
 COPY aws-publisher.py /aws-publisher.py  
 COPY entrypoint.sh /entrypoint.sh
 
 # Copy AWS certificates
-COPY ben-dell-xps-Policy /ben-dell-xps-Policy
-COPY ben-dell-xps.cert.pem /ben-dell-xps.cert.pem
-COPY ben-dell-xps.private.key /ben-dell-xps.private.key
-COPY ben-dell-xps.public.key /ben-dell-xps.public.key
-COPY root-CA.crt /root-CA.crt
+# COPY ben-dell-xps-Policy /ben-dell-xps-Policy
+# COPY ben-dell-xps.cert.pem /ben-dell-xps.cert.pem
+# COPY ben-dell-xps.private.key /ben-dell-xps.private.key
+# COPY ben-dell-xps.public.key /ben-dell-xps.public.key
+# COPY root-CA.crt /root-CA.crt
+
+# COPY /opt/ros/ws /ws
 
 # Set permissions
 RUN chmod +x /entrypoint.sh /ros-listener.py /aws-publisher.py

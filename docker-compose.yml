@@ -6,9 +6,13 @@ services:
     container_name: ros-listener
     tty: true            # keep stdin open for the prompt
     stdin_open: true
+    environment:
+      - AWS_GG_NUCLEUS_DOMAIN_SOCKET_FILEPATH_FOR_COMPONENT
+      - SVCUID
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock   # allow docker network connect
       - ~/ws:/opt/ros/ws
-      - ./images:/app/images  # Mount host ./images to container /app/images
+      # - ./images:/app/images  # Mount host ./images to container /app/images
+      - $AWS_GG_NUCLEUS_DOMAIN_SOCKET_FILEPATH_FOR_COMPONENT:$AWS_GG_NUCLEUS_DOMAIN_SOCKET_FILEPATH_FOR_COMPONENT
     restart: unless-stopped
 
