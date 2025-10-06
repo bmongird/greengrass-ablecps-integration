@@ -6,6 +6,9 @@ Tested and working on Ubuntu 18.04.
 ## How it Works
 In the com.ROSMQTT component, he `network_detect.py` script is constantly listening for new docker networks to be created. When it notices that AbLECPS creates one (AbLECPS spins up a new docker network for each run of the simulation with the form network_123), it creates our listener container and hooks it into that network. In the container, `ros-listener.py` listens for selected topics and relays those messages to `aws-publisher.py`. The aws-publisher script then uses Greengrass IPC to publish to a local topic, which is picked up by our script running in our other Greengrass component, com.GGPublisher. This has a simple script which will listen for any local Greengrass messages and send them to the AWS IoT MQTT broker after parsing.
 
+### Architecture Diagram
+![Architecture Diagram](arch.png "Architecture Diagram")
+
 ## Setup
 *NOTE: This setup assumes you have an AWS account and AbLECPS installed. This was tested on an amd64 architecture system with Ubuntu 18.04*
 
