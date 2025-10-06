@@ -1,0 +1,46 @@
+{
+  "RecipeFormatVersion": "2020-01-25",
+  "ComponentName": "com.ROSMQTT",
+  "ComponentVersion": "1.0.0",
+  "ComponentType": "aws.greengrass.generic",
+  "ComponentDescription": "ROS/MQTT Converter",
+  "ComponentPublisher": "Me",
+  "ComponentConfiguration": {
+    "DefaultConfiguration": {
+      "AccessControl": {
+        "aws.greengrass.ipc.pubsub": {
+          "com.ROSMQTT:pubsub:1": {
+            "policyDescription": "Allows access to publish/subscribe to all topics.",
+            "operations": [
+              "aws.greengrass#PublishToTopic",
+              "aws.greengrass#SubscribeToTopic"
+            ],
+            "resources": ["*"]
+          }
+        }
+      }
+    }
+  },
+  "Manifests": [
+    {
+      "Platform": {
+        "os": "linux"
+      },
+      "Name": "Linux",
+      "Lifecycle": {
+        "install": {
+          "Script": "bash -i -c 'cd {artifacts:decompressedPath}/com.ROSMQTT/artifacts && chmod +x {artifacts:decompressedPath}/com.ROSMQTT/artifacts/build.sh && {artifacts:decompressedPath}/com.ROSMQTT/artifacts/build.sh'",
+          "Timeout": 500
+        },
+        "run": "cd {artifacts:decompressedPath}/com.ROSMQTT/artifacts && python {artifacts:decompressedPath}/com.ROSMQTT/artifacts/network_detect.py"
+      },
+      "Artifacts": [
+        {
+          "Uri": "s3://BUCKET_NAME/COMPONENT_NAME/COMPONENT_VERSION/com.ROSMQTT.zip",
+          "Unarchive": "ZIP"
+        }
+      ]
+    }
+  ],
+  "Lifecycle": {}
+}

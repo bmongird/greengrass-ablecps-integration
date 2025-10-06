@@ -12,6 +12,7 @@ containers = {}
 def start_listener(name):
     print('Starting listener')
     child_env = os.environ.copy()                 # inherit everything
+    print(child_env)
     child_env['TARGET_TOPIC'] = '/uuv0/fdr_pos_est'
     child_env['NETWORK_SUFFIX'] = name[8:]
     container = subprocess.check_output(['docker-compose', 'run', '-d', '--rm', '--name', 'listener-{0}'.format(name[8:]), '-e', 'NETWORK_SUFFIX={0}'.format(name[8:]), 'listener'], env=child_env).decode().strip()

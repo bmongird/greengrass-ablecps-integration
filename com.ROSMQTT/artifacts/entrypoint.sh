@@ -30,7 +30,7 @@ export AWS_CERT_FILE="/ben-dell-xps.cert.pem"
 export AWS_KEY_FILE="/ben-dell-xps.private.key"
 export AWS_CA_FILE="/root-CA.crt"
 export CLIENT_ID="basicPubSub"
-export MQTT_TOPIC="iot"
+export MQTT_TOPIC="iot/uuv0"
 export ROS_TOPIC="${ROS_TOPIC:-/ground_truth_to_tf_uuv0/pose}"
 
 echo "\nRunning ROS to AWS IoT bridge...\n"

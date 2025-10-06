@@ -92,7 +92,7 @@ class AWSPublisher:
             payload_size = len(payload.encode('utf-8'))
             
             if payload_size > 120000:
-                print(f"Warning: Message too large ({payload_size} bytes), skipping...")
+                print(f"Message too large ({payload_size} bytes), skipping")
                 return
             
             full_topic = self.MQTT_TOPIC + '/' + subtopic if subtopic is not None else self.MQTT_TOPIC
