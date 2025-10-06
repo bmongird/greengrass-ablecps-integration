@@ -30,3 +30,5 @@ This should provide a good jumping off point for interacting with the simulator 
 It is entirely possible I may have missed mentioning an AWS permission somewhere. The errors are usually pretty descriptive and can give you a sense of which permission you should enable. If you find there's a permission that I forgot to describe please reach out and I will add it to the readme ASAP. 
 
 I found the `docker logs` command to be very valuable, and you can view your component's logs by running `sudo cat /greengrass/v2/logs/COMPONENT_NAME.log`. This should help with debugging most errors. As always, the AWS documentation is extremely valuable.
+
+The `topics.txt` file contains some of the topics found in the BlueROV sim. `listener.py` is a helper script that will display all ROS topics for a certain ROS network
