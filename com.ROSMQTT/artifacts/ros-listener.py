@@ -40,18 +40,12 @@ class ROSListener:
                 
                 # convert ROS image to OpenCV format
                 cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
-                # self.output_dir = "/app/images"
-                # if not os.path.exists(self.output_dir):
-                #     os.makedirs(self.output_dir)
-                # filename = os.path.join(self.output_dir, "frame_{}.jpg".format("l" if topic_name == "/vu_sss/waterfall_l" else "r"))
-                # cv2.imwrite(filename, cv_image)
                 
                 # resize to reduce data size 
                 small_image = cv2.resize(cv_image, (320, 240))
                 
                 # encode as jpg with lower quality for smaller size
-                _, buffer = cv2.imencode('.jpg', small_image, 
-                                       [cv2.IMWRITE_JPEG_QUALITY, 40])
+                _, buffer = cv2.imencode('.jpg', small_image, [cv2.IMWRITE_JPEG_QUALITY, 40])
                 
                 # convert to base64 for json transmission
                 image_base64 = base64.b64encode(buffer).decode('utf-8')

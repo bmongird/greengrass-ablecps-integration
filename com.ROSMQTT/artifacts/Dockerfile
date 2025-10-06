@@ -55,15 +55,6 @@ COPY ros-listener.py /ros-listener.py
 COPY aws-publisher.py /aws-publisher.py  
 COPY entrypoint.sh /entrypoint.sh
 
-# Copy AWS certificates
-# COPY ben-dell-xps-Policy /ben-dell-xps-Policy
-# COPY ben-dell-xps.cert.pem /ben-dell-xps.cert.pem
-# COPY ben-dell-xps.private.key /ben-dell-xps.private.key
-# COPY ben-dell-xps.public.key /ben-dell-xps.public.key
-# COPY root-CA.crt /root-CA.crt
-
-# COPY /opt/ros/ws /ws
-
 # Set permissions
 RUN chmod +x /entrypoint.sh /ros-listener.py /aws-publisher.py
 
