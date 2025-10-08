@@ -12,7 +12,7 @@ In the com.ROSMQTT component, he `network_detect.py` script is constantly listen
 ## Setup
 *NOTE: This setup assumes you have an AWS account and AbLECPS installed. This was tested on an amd64 architecture system with Ubuntu 18.04*
 
-Fork this repository and clone it to your machine. Next, follow [these](https://docs.aws.amazon.com/greengrass/v2/developerguide/getting-started.html) instructions to get the AWS Greengrass Core software _and sdk and cli_ working on the machine. You'll also need the AWS cli to authenticate.
+Fork this repository and clone it to your machine. Next, follow [these](https://docs.aws.amazon.com/greengrass/v2/developerguide/getting-started.html) instructions to get the AWS Greengrass Core software _and sdk and cli_ working on the machine. You'll also need the AWS cli to authenticate. When setting up Greengrass core, make sure you configure it to run as the same user as your AbLECPS sim so that it can access the environment variables. You should be able to do this in the command you run during installation (--component-default-user).
 
 Make sure you have Python 3.13 installed on the machine. 
 
